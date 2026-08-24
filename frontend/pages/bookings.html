@@ -9,7 +9,7 @@
 <body>
 
     <nav class="navbar">
-        <a href="../index.html" class="logo">Book<span>My</span>Show</a>
+        <a href="../index.html" class="logo">Show<span>Time</span></a>
         <div class="nav-links">
             <a href="../index.html">Home</a>
             <a href="movies.html">Movies</a>
@@ -38,10 +38,16 @@
                 return;
             }
 
+            const userId = user.id || (user.user && user.user.id);
+            if (!userId) {
+                showEmpty('bookings-list', 'Could not identify user. Please log in again.');
+                return;
+            }
+
             showLoading('bookings-list');
             try {
-                const bookings = await BookingAPI.getByUser(user.id);
-                if (bookings.length === 0) {
+                const bookings = await BookingAPI.getByUser(userId);
+                if (!bookings || bookings.length === 0) {
                     showEmpty('bookings-list', 'No bookings yet. Go book some movies! 🎬');
                     return;
                 }
@@ -55,7 +61,7 @@
                                     🏛️ ${b.show?.screen?.theater?.name || ''} — ${b.show?.screen?.name || ''}<br>
                                     📅 ${b.show?.showDate || ''} &nbsp; 🕐 ${b.show?.startTime || ''}<br>
                                     💺 Seats: ${b.seats ? b.seats.map(s => s.seatNumber).join(', ') : 'N/A'}<br>
-                                    🕑 Booked: ${b.bookedAt ? new Date(b.bookedAt).toLocaleString() : ''}
+                                    🕑 Booked: ${b.bookAt || b.bookedAt ? new Date(b.bookAt || b.bookedAt).toLocaleString() : 'N/A'}
                                 </p>
                             </div>
                             <div style="text-align:right;">
@@ -73,6 +79,7 @@
                     </div>
                 `).join('');
             } catch (e) {
+                console.error('Failed to load bookings:', e);
                 showEmpty('bookings-list', 'Could not load bookings');
             }
         }

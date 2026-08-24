@@ -21,7 +21,19 @@ function setLoggedInUser(user) {
 
 function getLoggedInUser() {
     const u = localStorage.getItem('bms_user');
-    return u ? JSON.parse(u) : null;
+    if (!u) return null;
+    try {
+        const parsed = JSON.parse(u);
+        if (parsed && parsed.user) {
+            return {
+                ...parsed.user,
+                token: parsed.token || parsed.user.token
+            };
+        }
+        return parsed;
+    } catch (e) {
+        return null;
+    }
 }
 
 function logout() {

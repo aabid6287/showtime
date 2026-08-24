@@ -9,7 +9,7 @@
 <body>
 
     <nav class="navbar">
-        <a href="../index.html" class="logo">Book<span>My</span>Show</a>
+        <a href="../index.html" class="logo">Show<span>Time</span></a>
         <div class="nav-links">
             <a href="../index.html">Home</a>
             <a href="movies.html" class="active">Movies</a>
@@ -219,17 +219,19 @@
             if (!user) { showToast('Please login', 'error'); return; }
             if (selectedSeatIds.length === 0) { showToast('Select at least one seat', 'error'); return; }
 
+            const userId = user.id || (user.user && user.user.id);
+
             try {
                 const booking = await BookingAPI.create({
-                    userId: user.id,
+                    userId: userId,
                     showId: currentShow.id,
                     seatIds: selectedSeatIds
                 });
                 showToast('🎉 Booking confirmed!', 'success');
                 closeModal('seat-modal');
-                setTimeout(() => window.location.href = `bookings.html`, 1500);
+                setTimeout(() => window.location.href = `bookings.html`, 1000);
             } catch (e) {
-                showToast(e.message, 'error');
+                showToast(e.message || 'Failed to create booking', 'error');
             }
         }
 

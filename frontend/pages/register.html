@@ -9,7 +9,7 @@
 <body>
 
     <nav class="navbar">
-        <a href="../index.html" class="logo">Book<span>My</span>Show</a>
+        <a href="../index.html" class="logo">Show<span>Time</span></a>
         <div class="nav-links">
             <a href="../index.html">Home</a>
             <a href="movies.html">Movies</a>
@@ -59,12 +59,11 @@
                 password: document.getElementById('password').value
             };
             try {
-                const user = await UserAPI.register(data);
-                setLoggedInUser(user);
-                showToast('Account created successfully!', 'success');
-                setTimeout(() => window.location.href = '../index.html', 1000);
+                const res = await UserAPI.register(data);
+                showToast(res.message || 'Account created successfully! Please login.', 'success');
+                setTimeout(() => window.location.href = 'login.html', 1500);
             } catch (err) {
-                showToast(err.message, 'error');
+                showToast(err.message || 'Failed to create account', 'error');
             }
         }
     </script>

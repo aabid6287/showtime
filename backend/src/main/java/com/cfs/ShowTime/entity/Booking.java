@@ -1,6 +1,7 @@
 package com.cfs.ShowTime.entity;
 
 import com.cfs.ShowTime.enums.BookingStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,21 +15,22 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "show_id",nullable = false)
     private Show show;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "booking_seats",
             joinColumns = @JoinColumn(name = "booking_id"),
@@ -44,7 +46,8 @@ public class Booking {
     @Column(name = "booked_at")
     private LocalDateTime bookAt;
 
-    private void onCreate() {
+    @PrePersist
+    protected void onCreate() {
         this.bookAt = LocalDateTime.now();
         if(this.status == null) {
             this.status = BookingStatus.CONFIRMED;

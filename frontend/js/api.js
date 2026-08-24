@@ -1,9 +1,33 @@
 // ===== API BASE URL =====
 const API = 'http://localhost:8080/api';
 
+function getAuthHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    let token = null;
+    if (typeof getLoggedInUser === 'function') {
+        const u = getLoggedInUser();
+        if (u && u.token) token = u.token;
+    }
+    if (!token) {
+        const raw = localStorage.getItem('bms_user');
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                token = parsed.token || (parsed.user && parsed.user.token);
+            } catch (e) {}
+        }
+    }
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
 // ===== GENERIC FETCH HELPERS =====
 async function apiGet(endpoint) {
-    const res = await fetch(`${API}${endpoint}`);
+    const res = await fetch(`${API}${endpoint}`, {
+        headers: getAuthHeaders()
+    });
     if (!res.ok) {
         const err = await res.json().catch(() => ({ message: res.statusText }));
         throw new Error(err.message || 'Request failed');
@@ -14,7 +38,7 @@ async function apiGet(endpoint) {
 async function apiPost(endpoint, data) {
     const res = await fetch(`${API}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data)
     });
     if (!res.ok) {
@@ -27,7 +51,7 @@ async function apiPost(endpoint, data) {
 async function apiPut(endpoint, data) {
     const res = await fetch(`${API}${endpoint}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: data ? JSON.stringify(data) : undefined
     });
     if (!res.ok) {
@@ -38,7 +62,10 @@ async function apiPut(endpoint, data) {
 }
 
 async function apiDelete(endpoint) {
-    const res = await fetch(`${API}${endpoint}`, { method: 'DELETE' });
+    const res = await fetch(`${API}${endpoint}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
     if (!res.ok) {
         const err = await res.json().catch(() => ({ message: res.statusText }));
         throw new Error(err.message || 'Request failed');
@@ -50,11 +77,12 @@ async function apiDelete(endpoint) {
 
 // ===== USER APIs =====
 const UserAPI = {
-    register: (data) => apiPost('/users/register', data),
-    login: (data) => apiPost('/users/login', data),
+    register: (data) => apiPost('/auth/register', data),
+    login: (data) => apiPost('/auth/login', data),
     getAll: () => apiGet('/users'),
     getById: (id) => apiGet(`/users/${id}`)
 };
+
 
 // ===== CITY APIs =====
 const CityAPI = {

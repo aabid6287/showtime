@@ -1,5 +1,6 @@
 package com.cfs.ShowTime.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Screen {
 
     @Id
@@ -21,7 +23,7 @@ public class Screen {
 
     private Integer totalSeats;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "theater_id",nullable = false)
     private Theater theater;
 }

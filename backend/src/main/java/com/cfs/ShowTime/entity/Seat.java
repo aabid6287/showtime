@@ -1,6 +1,7 @@
 package com.cfs.ShowTime.entity;
 
 import com.cfs.ShowTime.enums.SeatType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Seat {
 
     @Id
@@ -29,7 +31,7 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     private SeatType seatType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "screen_id",nullable = false)
     private Screen screen;
 }
