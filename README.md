@@ -763,6 +763,6 @@ The frontend will open at the URL provided by Live Server.
 
 **⭐ Star this repo if you found it helpful!**
 
-Made By **Aabid** ❤️
+Made By **Md Aabid** ❤️
 
 </div>
